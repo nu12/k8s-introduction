@@ -1,0 +1,10 @@
+cd exercise2/
+kubectl create deployment www --image=nginx:1.14 --dry-run=client -o yaml > www.yaml
+kubectl apply -f www.yaml 
+kubectl scale -h
+kubectl scale --replicas=3 deploy/www
+kubectl set image deploy/www nginx=nginx:1.16-alpine --record
+kubectl rollout history deploy/www
+kubectl rollout undo -h
+kubectl rollout undo deploy www
+kubectl delete deploy/www

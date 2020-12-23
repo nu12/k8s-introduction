@@ -1,0 +1,10 @@
+ 1488  cd exercises/
+ 1502  kubectl create configmap logstash-config --from-file=logstash.conf 
+ 1504  kubectl get cm logstash-config -o yaml
+ 1505  kubectl apply -f .
+ 1508  kubectl get deploy,svc,po
+ 1509  kubectl run testlog --restart=Never --image=mingrammer/flog -- -f apache_combined
+ 1510  kubectl get -w po
+ 1511  kubectl logs testlog > nginx.log
+ 1515  kubectl get nodes -o wide
+ 1516  while read -r line; do curl -s -XPUT -d "$line" http://192.168.49.2:31500; done < ./nginx.log

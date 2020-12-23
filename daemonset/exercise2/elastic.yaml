@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+data:
+  logstash.conf: |
+    input {
+     http {}
+    }
+
+    filter {
+     grok {
+       match => [ "message" , "%{COMBINEDAPACHELOG}+%{GREEDYDATA:extra_fields}"]
+       overwrite => [ "message" ]
+     }
+     mutate {
+       convert => ["response", "integer"]
+       convert => ["bytes", "integer"]
+       convert => ["responsetime", "float"]
+     }
+     geoip {
+       source => "clientip"
+       target => "geoip"
+       add_tag => [ "nginx-geoip" ]
+     }
+     date {
+       match => [ "timestamp" , "dd/MMM/YYYY:HH:mm:ss Z" ]
+       remove_field => [ "timestamp" ]
+     }
+     useragent {
+       source => "agent"
+     }
+    }
+
+    output {
+     elasticsearch {
+       hosts => ["elasticsearch:9200"]
+     }
+     stdout { codec => rubydebug }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - image: elasticsearch:7.6.2
+        name: elasticsearch
+        env:
+        - name: ES_JAVA_OPTS 
+          value: -Xms512m -Xmx512m
+        - name: discovery.type
+          value: single-node
+      initContainers:
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+spec:
+  type: ClusterIP
+  ports:
+  - name: elasticsearch
+    port: 9200
+    targetPort: 9200
+  selector:
+    app: elasticsearch
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - image: kibana:7.6.2
+        name: kibana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+spec:
+  type: NodePort
+  ports:
+  - port: 5601
+    targetPort: 5601
+    nodePort: 31501
+  selector:
+    app: kibana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - image: logstash:7.6.2
+        name: logstash
+        volumeMounts:
+        - mountPath: /config/logstash.conf
+          name: config
+        command:
+        - "logstash"
+        - "-f"
+        - "/config/logstash.conf"
+      volumes:
+      - name: config
+        configMap:
+          name: logstash-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+spec:
+  type: NodePort
+  ports:
+  - name: logstash
+    port: 8080
+    targetPort: 8080
+    nodePort: 31500
+  selector:
+    app: logstash

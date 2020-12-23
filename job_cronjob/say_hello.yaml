@@ -1,0 +1,20 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: say-hello
+spec:
+  jobTemplate:
+    metadata:
+      name: say-hello
+    spec:
+      template:
+        spec:
+          containers:
+          - image: alpine:latest
+            name: say-hello
+            command:
+            - /bin/sh
+            - -c
+            - sleep 10; echo Hello form kube; date
+          restartPolicy: OnFailure
+  schedule: '*/1 * * * *'

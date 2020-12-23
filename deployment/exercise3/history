@@ -1,0 +1,16 @@
+  901  cd exercise3/
+  902  kubectl -h | grep auto
+  903  kubectl autoscale -h
+  908  kubectl create deployment www --image=nginx:1.16 --dry-run=client -o yaml > www.yaml
+  909  kubectl apply -f www.yaml 
+  911  kubectl autoscale -h
+  913  kubectl autoscale deploy www --min=2 --max=10 --cpu-percent=50 --dry-run=client -o yaml > hpa.yaml
+  914  kubectl apply -f hpa.yaml 
+  915  minikube addons enable metrics-server
+  930  kubectl create service nodeport www --tcp=80:80  --dry-run=client -o yaml > svc.yaml
+  931  kubectl apply -f svc.yaml 
+  938  kubectl get nodes -o wide
+  945  ubectl run ab --restart='Never' --image=lucj/ab -- -n 100000 -c 50 http://192.168.49.2:31001/
+  956  kubectl delete deploy/www
+  958  kubectl delete svc/www
+  962  kubectl delete po/ab

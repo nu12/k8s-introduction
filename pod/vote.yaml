@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vote-pod
+  labels:
+    app: vote
+spec:
+  containers:
+  - image: instavote/vote
+    name: vote-container
+    ports:
+    - containerPort: 80

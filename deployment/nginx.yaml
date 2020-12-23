@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: www-deployment
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: www-template # This should match
+
+  template:
+    metadata:
+      labels:
+        app: www-template # This should match
+    spec:
+      containers:
+      - image: nginx:1.16
+        name: www-container

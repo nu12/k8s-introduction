@@ -1,0 +1,12 @@
+ 1156  cd exercise1/
+ 1158  kubectl create namespace development
+ 1159  kubectl create namespace production
+ 1160  kubectl get namespaces 
+ 1162  kubectl run www-0 --image=nginx:1.16
+ 1163  kubectl run www-1 --image=nginx:1.16 --namespace=development
+ 1164  kubectl run www-2 --image=nginx:1.16 --namespace=production
+ 1165  kubectl get pods
+ 1166  kubectl get pods --all-namespaces 
+ 1167  kubectl delete ns/development ns/production
+ 1168  kubectl get pods --all-namespaces 
+ 1169  kubectl delete po/www-0

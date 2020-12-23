@@ -1,0 +1,7 @@
+ 1176  cd exercise2/
+ 1184  kubectl create namespace test-quota
+ 1185  kubectl apply quota.yaml --namespace=test-quota 
+ 1186  kubectl apply -f quota.yaml --namespace=test-quota 
+ 1187  kubectl apply -f pod-with-resources-1.yaml --namespace=test-quota 
+ 1188  kubectl apply -f pod-with-resources-2.yaml --namespace=test-quota 
+ 1189  kubectl delete ns/test-quota

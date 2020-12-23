@@ -1,0 +1,11 @@
+ 1389  cd exercise1/
+ 1397  kubectl run nginx --image=nginx:1.16 --dry-run=client -o yaml > pod.yaml
+ 1398  nano pod.yaml 
+ 1408  kubectl create configmap nginx-configMap --from-file=nginx.conf --dry-run=client -o yaml > configMap.yaml
+ 1419  kubectl create service nodeport vote-proxy --tcp=8080:8080 --dry-run=client -o yaml > service.yaml
+ 1422  nano service.yaml 
+ 1425  nano configMap.yaml 
+ 1426  kubectl apply -f configMap.yaml 
+ 1430  kubectl apply -f pod.yaml 
+ 1432  kubectl apply -f service.yaml 
+ 1433  kubectl get nodes -o wide
